@@ -1,0 +1,51 @@
+/*
+ * Makerdiary nRF52840 MDK USB Dongle application layout for factory UF2 v0.7.1.
+ * The upstream Zephyr board's stock partition table is intended for a
+ * different bootloader / MCUboot setup; do not use its slot at 0x10000 here.
+ *
+ * Makerdiary factory memory map:
+ * 0x00000-0x00FFF MBR; 0x01000-0xF3FFF application area;
+ * 0xF4000-0xFFFFF bootloader and settings (must stay untouched).
+ *
+ * Reserve 0xEC000-0xF3FFF for remapper NVS settings, matching the
+ * existing Bluetooth builds' 32-KiB settings reservation.
+ */
+
+/ {
+    chosen {
+        zephyr,code-partition = &code_partition;
+    };
+
+    aliases {
+        /* This board's only button is P0.18. */
+        sw0 = &reset_button;
+        /* Use red activity LED and blue Bluetooth-state LED. */
+        led0 = &led0_red;
+        led1 = &led0_blue;
+    };
+};
+
+&flash0 {
+    partitions {
+        /delete-node/ partition@1000;
+        /delete-node/ partition@10000;
+        /delete-node/ partition@6e000;
+        /delete-node/ partition@cc000;
+        /delete-node/ partition@d0000;
+
+        code_partition: partition@1000 {
+            label = "code_partition";
+            reg = <0x00001000 0x000eb000>;
+        };
+
+        storage_partition: partition@ec000 {
+            label = "storage";
+            reg = <0x000ec000 0x00008000>;
+        };
+
+        boot_partition: partition@f4000 {
+            label = "makerdiary_bootloader_reserved";
+            reg = <0x000f4000 0x0000c000>;
+        };
+    };
+};
