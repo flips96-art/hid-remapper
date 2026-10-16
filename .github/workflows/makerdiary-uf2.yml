@@ -20,6 +20,8 @@ jobs:
             west build -p always -b nrf52840_mdk_usb_dongle
           cp firmware-bluetooth/build/zephyr/remapper.uf2 \
             firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
+      - name: Validate UF2 address range and headers
+        run: python3 firmware-bluetooth/tools/validate_makerdiary_uf2.py firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
       - uses: actions/upload-artifact@v4
         with:
           name: makerdiary-uf2-EXPERIMENTAL-DO-NOT-FLASH
