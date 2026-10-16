@@ -1,0 +1,26 @@
+name: Experimental Makerdiary UF2 build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [makerdiary-uf2-experiment]
+    paths:
+      - 'firmware-bluetooth/**'
+      - '.github/workflows/makerdiary-uf2.yml'
+
+jobs:
+  build-makerdiary:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build experimental Makerdiary application
+        run: |
+          docker run --rm -v "$PWD:/workdir/project" -w /workdir/project/firmware-bluetooth \
+            nordicplayground/nrfconnect-sdk:v2.2-branch \
+            west build -p always -b nrf52840_mdk_usb_dongle
+          cp firmware-bluetooth/build/zephyr/remapper.uf2 \
+            firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: makerdiary-uf2-EXPERIMENTAL-DO-NOT-FLASH
+          path: firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
