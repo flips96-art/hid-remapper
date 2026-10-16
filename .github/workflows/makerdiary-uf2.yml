@@ -17,7 +17,7 @@ jobs:
         run: |
           docker run --rm -v "$PWD:/workdir/project" -w /workdir/project/firmware-bluetooth \
             nordicplayground/nrfconnect-sdk:v2.2-branch \
-            west build -p always -b nrf52840_mdk_usb_dongle
+            west build -p always -b nrf52840_mdk_usb_dongle -- -DEXTRA_CONF_FILE=makerdiary-safe.conf
           cp firmware-bluetooth/build/zephyr/remapper.uf2 \
             firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
       - name: Validate UF2 address range and headers
