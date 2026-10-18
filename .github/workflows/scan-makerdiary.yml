@@ -1,0 +1,40 @@
+name: Scan experimental Makerdiary firmware
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [makerdiary-uf2-experiment]
+    paths:
+      - '.github/workflows/scan-makerdiary.yml'
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Retrieve exact validated GitHub artifact (no PC download)
+        uses: actions/download-artifact@v4
+        with:
+          name: makerdiary-uf2-EXPERIMENTAL-DO-NOT-FLASH
+          run-id: 39094413639
+          github-token: ${{ github.token }}
+          path: sample
+      - name: Verify exact firmware checksum and archive contents
+        run: |
+          test "$(find sample -type f | wc -l)" -eq 1
+          test -f sample/remapper_makerdiary_EXPERIMENTAL.uf2
+          printf '%s  %s\n' \
+            d5b2c7471f4c1836303cf42c1f573a0d5e1f9cc1b620857e2d9accc2b10278cb \
+            sample/remapper_makerdiary_EXPERIMENTAL.uf2 | sha256sum -c -
+      - name: Install and refresh ClamAV signatures
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq clamav clamav-freshclam
+          sudo systemctl stop clamav-freshclam || true
+          sudo freshclam
+      - name: Independently scan firmware file without executing it
+        run: |
+          clamscan --infected --recursive sample
