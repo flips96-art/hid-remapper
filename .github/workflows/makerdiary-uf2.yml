@@ -22,6 +22,10 @@ jobs:
             firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
       - name: Validate UF2 address range and headers
         run: python3 firmware-bluetooth/tools/validate_makerdiary_uf2.py firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
+      - name: Verify persistent UICR safety options
+        run: |
+          grep -qx 'CONFIG_GPIO_AS_PINRESET=n' firmware-bluetooth/build/zephyr/.config
+          grep -qx 'CONFIG_NFCT_PINS_AS_GPIOS=n' firmware-bluetooth/build/zephyr/.config
       - uses: actions/upload-artifact@v4
         with:
           name: makerdiary-uf2-EXPERIMENTAL-DO-NOT-FLASH
