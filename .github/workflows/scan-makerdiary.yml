@@ -19,7 +19,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: makerdiary-uf2-EXPERIMENTAL-DO-NOT-FLASH
-          run-id: 39094413639
+          run-id: 39096517313
           github-token: ${{ github.token }}
           path: sample
       - name: Verify exact firmware checksum and archive contents
@@ -27,7 +27,7 @@ jobs:
           test "$(find sample -type f | wc -l)" -eq 1
           test -f sample/remapper_makerdiary_EXPERIMENTAL.uf2
           printf '%s  %s\n' \
-            d5b2c7471f4c1836303cf42c1f573a0d5e1f9cc1b620857e2d9accc2b10278cb \
+            7fe8d315caf06817dd3e5b242805eac6716ae670d0fc19d8d2b90cc0442c20bf \
             sample/remapper_makerdiary_EXPERIMENTAL.uf2 | sha256sum -c -
       - name: Install and refresh ClamAV signatures
         run: |
