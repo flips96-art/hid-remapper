@@ -718,6 +718,7 @@ static bool do_send_report(uint8_t interface, const uint8_t* report_with_id, uin
     if (interface == 1) {
         return CHK(hid_int_ep_write(hid_dev1, report_with_id, len, NULL));
     }
+    return false;  // Unexpected interface number: no HID endpoint to send to.
 }
 
 static void button_init() {
