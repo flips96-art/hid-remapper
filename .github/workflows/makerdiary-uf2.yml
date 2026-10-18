@@ -24,8 +24,15 @@ jobs:
         run: python3 firmware-bluetooth/tools/validate_makerdiary_uf2.py firmware-bluetooth/remapper_makerdiary_EXPERIMENTAL.uf2
       - name: Verify persistent UICR safety options
         run: |
-          grep -qx 'CONFIG_GPIO_AS_PINRESET=n' firmware-bluetooth/build/zephyr/.config
-          grep -qx 'CONFIG_NFCT_PINS_AS_GPIOS=n' firmware-bluetooth/build/zephyr/.config
+          for setting in CONFIG_GPIO_AS_PINRESET CONFIG_NFCT_PINS_AS_GPIOS; do
+            echo "Checking $setting is disabled:"
+            grep -F "$setting" firmware-bluetooth/build/zephyr/.config || true
+            grep -Eq "^# ${setting} is not set$|^${setting}=n$" firmware-bluetooth/build/zephyr/.config || {
+              echo "ERROR: $setting is not explicitly disabled in compiled Kconfig."
+              exit 1
+            }
+          done
+          echo "PASS: UICR-related options disabled."
       - uses: actions/upload-artifact@v4
         with:
           name: makerdiary-uf2-EXPERIMENTAL-DO-NOT-FLASH
